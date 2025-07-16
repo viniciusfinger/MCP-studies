@@ -1,0 +1,15 @@
+[project]
+name = "simple-client"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "langchain>=0.3.26",
+    "langchain-groq>=0.3.6",
+    "langchain-mcp-adapters>=0.1.9",
+    "langchain-openai>=0.3.28",
+    "langgraph>=0.5.3",
+    "pandas>=2.3.1",
+    "python-dotenv>=1.1.1",
+]
