@@ -11,7 +11,7 @@ def summarize_csv_file(filename: str) -> CallToolResult:
     Args:
         filename: Name of the CSV file in the /data directory (e.g., 'sample.csv')
     Returns:
-        A string describing the file's dimensions.
+        A CallToolResult object with a string describing the file's dimensions.
     """
     if not filename:
         print("Error: No filename provided.")

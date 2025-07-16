@@ -31,10 +31,6 @@ async def call_client():
     prompt = """
     Você é um assistente especializado em análise de dados.
         
-        FERRAMENTAS DISPONÍVEIS:
-        - summarize_csv_file: Para arquivos CSV (.csv)
-        - summarize_parquet_file: Para arquivos Parquet (.parquet)
-        
         REGRAS IMPORTANTES:
         1. Use APENAS o nome exato do arquivo mencionado pelo usuário
         2. Se o arquivo não for CSV ou Parquet, informe que não pode analisar
@@ -51,7 +47,7 @@ async def call_client():
 
     messages = [
             SystemMessage(content=prompt),
-            HumanMessage(content="Resuma o arquivo sample.xlsx")
+            HumanMessage(content="Resuma o arquivo sample.csv")
         ]
     try:
         response = await agent.ainvoke(
