@@ -51,7 +51,7 @@ async def call_client():
 
     messages = [
             SystemMessage(content=prompt),
-            HumanMessage(content="Resuma o arquivo sample.csv")
+            HumanMessage(content="Resuma o arquivo sample.xlsx")
         ]
     try:
         response = await agent.ainvoke(
@@ -61,7 +61,8 @@ async def call_client():
                     "max_iterations": 1,
                     "max_execution_time": 30
                 }
-            })
+            }
+        )
         
         print(response["messages"][-1].content)
     except Exception as e:

@@ -18,7 +18,7 @@ def read_csv_summary(filename: str) -> str:
     
     # Verificar se o arquivo existe
     if not file_path.exists():
-        return f"Erro: Arquivo '{filename}' não encontrado na pasta data."
+        return f"Error: The file '{filename}' does not exist in the 'data' directory."
     
     df = pd.read_csv(file_path)
 
