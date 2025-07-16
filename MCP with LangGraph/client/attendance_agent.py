@@ -2,7 +2,6 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
 from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 from state import State
@@ -42,21 +41,7 @@ async def attendance_agent(state: State):
                 Você é um atendente de uma empresa de tecnologia e atende os clientes em seu primeiro contato.
                 Você deve coletar as informações necessárias e persistir no banco de dados para que o vendedor entre em contato com o cliente.
 
-                Para isso, você deve utilizar as seguintes ferramentas disponíveis para coletar as informações necessárias para salvar o cliente:
-
-                1. **tool_save_user_data**: 
-                Utilize esta ferramenta para coletar informações básicas do cliente, como nome, email, telefone e cidade e salvar os dados do cliente.
-                    - **Argumentos:**  
-                        - `name`: (Opcional): Nome do cliente.
-                        - `phone`: (Opcional): O telefone do cliente.
-                        - `email`: (Opcional): O email do cliente.
-                        - `city`: (Opcional): A cidade do cliente.        
-
-                    - **Comportamento esperado:**
-                        Se solicitado, a ferramenta pode retornar mensagens para pedir mais informações ou fornecer as informações já obtidas.        
-                        Caso necessário, peça mais informações para extrair um entendimento robusto e adequado. 
-                        Seja claro, legal e gentil.
-                        Responda na língua portuguesa do Brasil, não use markdown.
+                Para isso, você deve utilizar as ferramentas disponíveis para coletar as informações necessárias para salvar o cliente.
             """),
             ("placeholder", "{messages}")
         ]
