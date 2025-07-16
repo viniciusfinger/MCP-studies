@@ -3,6 +3,8 @@ from graph import create_graph
 from langchain_core.messages import HumanMessage
 from chat_message import ChatMessage
 from datetime import datetime
+from message_role import MessageRole
+
 
 router = APIRouter()
 graph = create_graph()
@@ -25,6 +27,6 @@ async def chat(chat_message: ChatMessage) -> ChatMessage:
     return ChatMessage(
         session_id=chat_message.session_id,
             message=response["messages"][-1].content,
-            role="assistant",
+            role=MessageRole.ASSISTANT,
             timestamp=datetime.now()
         )
