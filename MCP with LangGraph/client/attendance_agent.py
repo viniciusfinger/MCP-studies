@@ -5,7 +5,6 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 from state import State
-import asyncio
 import os
 
 load_dotenv()
@@ -60,7 +59,8 @@ async def attendance_agent(state: State):
             config={
                 "configurable": {
                     "max_iterations": 1,
-                    "max_execution_time": 30
+                    "max_execution_time": 10,
+                    "max_retries": 3
                 }
             }
         )
