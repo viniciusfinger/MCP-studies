@@ -24,9 +24,11 @@ async def chat(chat_message: ChatMessage) -> ChatMessage:
                 config
             )
     
+    last_message = response["messages"][-1]
+    
     return ChatMessage(
         session_id=chat_message.session_id,
-            message=response["messages"][-1].content,
-            role=MessageRole.ASSISTANT,
+            message=last_message.content,
+            role=MessageRole.from_str(last_message.type),
             timestamp=datetime.now()
         )

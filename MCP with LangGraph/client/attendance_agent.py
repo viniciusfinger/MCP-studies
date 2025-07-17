@@ -1,4 +1,5 @@
 from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_core.tools import ToolException
 from langgraph.prebuilt import create_react_agent
 from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
@@ -6,10 +7,26 @@ from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 from state import State
 import os
+from httpx import ConnectError
+try:
+    import httpcore
+    HttpCoreConnectError = httpcore.ConnectError
+except ImportError:
+    HttpCoreConnectError = None
 
 load_dotenv()
 
-async def attendance_agent(state: State):
+async def attendance_agent(state: State) -> State:
+    """
+    Attendance agent is responsible for collecting the necessary information to save the client.
+    It uses the tools available to collect the information.
+
+    Args:
+        state: State object containing the current state of the agent.
+
+    Returns:
+        State object containing the updated state of the agent.
+    """
 
     # model = ChatGroq(
     #     model_name="llama-3.3-70b-versatile",
@@ -32,7 +49,24 @@ async def attendance_agent(state: State):
         }
     )
 
-    tools = await client.get_tools()
+    try:
+        tools = await client.get_tools()
+    #TODO: create a exception handler 
+    except Exception as e:
+        if hasattr(e, 'exceptions'):
+            for exc in e.exceptions:
+                if isinstance(exc, ConnectError) or isinstance(exc, HttpCoreConnectError):
+                    print("Connection error: unable to connect to MCP service at http://localhost:8000/mcp.")
+                    print("Check if the MCP service is running and accessible.")
+                    
+                    from langchain_core.messages import SystemMessage
+                    state["messages"].append(
+                        SystemMessage(content="Sorry, I have an internal problem. Please try again later.")
+                    )
+                    return state
+                else:
+                    print(f"Error: {e}")
+                    raise e
 
     prompt_template = ChatPromptTemplate.from_messages(
         [
@@ -66,7 +100,18 @@ async def attendance_agent(state: State):
         )
 
         state["messages"].append(response["messages"][-1])
-
         return state
+    
+    except ToolException as te:
+        print("Tool error:")
+        print(f"Error type: {type(te).__name__}")
+        print(f"Error message: {te}")
+        raise te
     except Exception as e:
-        print(e)
+        import traceback
+        print("Error during agent execution:")
+        print(f"Error type: {type(e).__name__}")
+        print(f"Error message: {e}")
+        print("Stack trace:")
+        traceback.print_exc()
+        raise e
