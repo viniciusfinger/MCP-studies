@@ -1,5 +1,7 @@
 from server import mcp
-from mcp.types import CallToolResult, TextContent
+from utils.file_reader import read_csv_summary
+from mcp.types import CallToolResult, TextContent, ReadResourceResult, TextResourceContents
+import os
 from typing import Optional
 
 @mcp.tool()
@@ -49,3 +51,7 @@ def tool_save_user_data(name: Optional[str] = None, email: Optional[str] = None,
     return CallToolResult(
         content=[TextContent(text="User data saved successfully.", type="text")],
         isError=False)
+
+@mcp.resource("text://hello_world")
+def resource_hello_world():
+    return "Hello, world!"
