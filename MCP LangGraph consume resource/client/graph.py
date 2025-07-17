@@ -1,7 +1,7 @@
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph.state import StateGraph, CompiledStateGraph, START, END
 from state import State
-from attendance_agent import attendance_agent
+from resource_agent import resource_agent
 
 def create_graph() -> CompiledStateGraph:
 
@@ -9,9 +9,9 @@ def create_graph() -> CompiledStateGraph:
 
     graph = StateGraph(State)
 
-    graph.add_node("attendance", attendance_agent)
+    graph.add_node("resource", resource_agent)
 
-    graph.add_edge(START, "attendance")
-    graph.add_edge("attendance", END)
+    graph.add_edge(START, "resource")
+    graph.add_edge("resource", END)
 
     return graph.compile(checkpointer=checkpointer)

@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from state import State
 import os
 from exception_handler import handle_ai_exception
+import json
 
 load_dotenv()
 
@@ -40,7 +41,11 @@ async def resource_agent(state: State) -> State:
     )
 
     try:
-        resources = await client.get_resources("simple_server")
+        resources = await client.get_resources(server_name="simple_server", uris=["text://greeting/vinicius"])
+        
+        resource_data = json.loads(resources[0].data)
+        greeting = resource_data["contents"][0]["text"]
+
         tools = await client.get_tools()
     except Exception as e:
         state["messages"].append(handle_ai_exception(e))
