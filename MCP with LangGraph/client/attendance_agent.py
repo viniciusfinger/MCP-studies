@@ -10,6 +10,8 @@ from exception_handler import handle_ai_exception
 
 load_dotenv()
 
+#TODO: adicionar logging no projeto
+
 async def attendance_agent(state: State) -> State:
     """
     Attendance agent is responsible for collecting the necessary information to save the client.
