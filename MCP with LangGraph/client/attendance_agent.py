@@ -1,16 +1,15 @@
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain_core.tools import ToolException
 from langgraph.prebuilt import create_react_agent
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 from state import State
 import os
-from exception_handler import handle_ai_exception
+from exception_handler import handle_agent_exception
+import logging
 
 load_dotenv()
-
-#TODO: adicionar logging no projeto
+logger = logging.getLogger(__name__)
 
 async def attendance_agent(state: State) -> State:
     """
@@ -23,7 +22,7 @@ async def attendance_agent(state: State) -> State:
     Returns:
         State object containing the updated state of the agent.
     """
-    
+    logger.info("Starting attendance agent")
     model = ChatOpenAI(
         model_name="gpt-4o",
         temperature=0.5,
@@ -33,7 +32,7 @@ async def attendance_agent(state: State) -> State:
     client = MultiServerMCPClient(
         {
             "simple_server": {
-                "url": "http://localhost:8000/mcp",
+                "url": os.getenv("MCP_SERVER_URL", "http://localhost:8000/mcp"),
                 "transport": "streamable_http"
             }
         }
@@ -41,29 +40,27 @@ async def attendance_agent(state: State) -> State:
 
     try:
         tools = await client.get_tools()
-    except Exception as e:
-        state["messages"].append(handle_ai_exception(e))
-        return state
-    prompt_template = ChatPromptTemplate.from_messages(
-        [
-            ("system", """
-                Você é um atendente de uma empresa de tecnologia e atende os clientes em seu primeiro contato.
-                Você deve coletar as informações necessárias e persistir no banco de dados para que o vendedor entre em contato com o cliente.
 
-                Para isso, você deve utilizar as ferramentas disponíveis para coletar as informações necessárias para salvar o cliente.
-            """),
-            ("placeholder", "{messages}")
-        ]
-    )
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", """
+                    Você é um atendente de uma empresa de tecnologia e atende os clientes em seu primeiro contato.
+                    Você deve coletar as informações necessárias e persistir no banco de dados para que o vendedor entre em contato com o cliente.
 
-    agent = create_react_agent(
-        model=model,
-        tools=tools,
-        checkpointer=False,
-        prompt=prompt_template
-    )
+                    Para isso, você deve utilizar as ferramentas disponíveis para coletar as informações necessárias para salvar o cliente.
+                """),
+                ("placeholder", "{messages}")
+            ]
+        )
 
-    try:
+        agent = create_react_agent(
+            model=model,
+            tools=tools,
+            checkpointer=False,
+            prompt=prompt
+        )
+
+        logger.info("Invoking agent")
         response = await agent.ainvoke(
             {"messages": state["messages"]},
             config={
@@ -74,21 +71,12 @@ async def attendance_agent(state: State) -> State:
                 }
             }
         )
+        logger.info("Successfully invoked agent")
 
         state["messages"].append(response["messages"][-1])
         return state
     
-    #TODO: adicionar o tratamento de exception aqui
-    except ToolException as te:
-        print("Tool error:")
-        print(f"Error type: {type(te).__name__}")
-        print(f"Error message: {te}")
-        raise te
     except Exception as e:
-        import traceback
-        print("Error during agent execution:")
-        print(f"Error type: {type(e).__name__}")
-        print(f"Error message: {e}")
-        print("Stack trace:")
-        traceback.print_exc()
-        raise e
+        treated_message = handle_agent_exception(e)
+        state["messages"].append(treated_message)
+        return state
