@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 @mcp.tool()
-def tool_save_user_data(ctx: Context, name: Optional[str] = None, email: Optional[str] = None, phone: Optional[str] = None, city: Optional[str] = None) -> CallToolResult:
+def tool_save_user_data(context: Context, name: Optional[str] = None, email: Optional[str] = None, phone: Optional[str] = None, city: Optional[str] = None) -> CallToolResult:
     """ 
     Use this tool to save the user data to the database. If some of the data is missing, the tool will return a message asking for the missing data until the data is complete.
     
@@ -22,7 +22,7 @@ def tool_save_user_data(ctx: Context, name: Optional[str] = None, email: Optiona
     Returns:
         A CallToolResult object with a string describing the users's data saved.
     """
-    thread_id = get_thread_id(ctx)
+    thread_id = get_thread_id(context)
     
     logger.info(f"Thread ID: {thread_id} - Received user data: {name}, {email}, {phone}, {city} ")
     
