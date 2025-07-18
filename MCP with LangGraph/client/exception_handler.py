@@ -1,12 +1,11 @@
 from langchain_core.messages import AnyMessage
 from httpx import ConnectError
 from langchain_core.messages import SystemMessage
-import logging
+from logging import Logger
 from langchain_core.tools import ToolException
 
-logger = logging.getLogger(__name__)
 
-def handle_agent_exception(e: Exception) -> AnyMessage:
+def handle_agent_exception(e: Exception, logger: Logger) -> AnyMessage:
     """
     Log and handle AI agent exceptions.
 
@@ -16,7 +15,7 @@ def handle_agent_exception(e: Exception) -> AnyMessage:
     Returns:
         A Message object with a treated message to return to the user.
     """
-
+    
     if hasattr(e, 'exceptions'):
         for exc in e.exceptions:
             if isinstance(exc, ConnectError):
@@ -24,7 +23,7 @@ def handle_agent_exception(e: Exception) -> AnyMessage:
             else:
                 logger.error(f"Unexpected error: {exc}")
     elif isinstance(e, ToolException):
-        logger.error(f"Tool error: {e}")
+        logger.error(f"Tool error: {e.tool_name}")
     else:
         logger.error(f"Unexpected error: {e}")
     return SystemMessage(content="Sorry, I have an internal problem. Please try again later.")

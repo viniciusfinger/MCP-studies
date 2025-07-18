@@ -2,10 +2,12 @@ from controller.chat_controller import router
 from fastapi import FastAPI
 import uvicorn
 from config.log_config import setup_logging
+from config.thread_id_middleware import ThreadIdMiddleware
 
 setup_logging()
 
 app = FastAPI()
+app.add_middleware(ThreadIdMiddleware)
 app.include_router(router, tags=["chat"])
 
 if __name__ == "__main__":

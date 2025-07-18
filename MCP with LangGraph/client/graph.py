@@ -1,7 +1,7 @@
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph.state import StateGraph, CompiledStateGraph, START, END
 from state import State
-from attendance_agent import attendance_agent
+from agent.attendance_agent import attendance_agent
 
 def create_graph() -> CompiledStateGraph:
 

@@ -22,7 +22,7 @@ async def attendance_agent(state: State) -> State:
     Returns:
         State object containing the updated state of the agent.
     """
-    logger.info("Starting attendance agent")
+    logger.debug(f"Starting attendance agent")
     model = ChatOpenAI(
         model_name="gpt-4o",
         temperature=0.5,
@@ -60,7 +60,7 @@ async def attendance_agent(state: State) -> State:
             prompt=prompt
         )
 
-        logger.info("Invoking agent")
+        logger.debug(f"Invoking agent")
         response = await agent.ainvoke(
             {"messages": state["messages"]},
             config={
@@ -71,12 +71,12 @@ async def attendance_agent(state: State) -> State:
                 }
             }
         )
-        logger.info("Successfully invoked agent")
+        logger.debug(f"Successfully invoked agent")
 
         state["messages"].append(response["messages"][-1])
         return state
     
     except Exception as e:
-        treated_message = handle_agent_exception(e)
+        treated_message = handle_agent_exception(e, logger)
         state["messages"].append(treated_message)
         return state
