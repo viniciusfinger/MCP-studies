@@ -1,12 +1,16 @@
 from server import mcp
 from mcp.types import CallToolResult, TextContent
+from mcp.server.fastmcp import Context
 from typing import Optional
+
+from utils.context_utils import get_thread_id
 import logging
 
+logger = logging.getLogger(__name__)
+
 @mcp.tool()
-def tool_save_user_data(name: Optional[str] = None, email: Optional[str] = None, phone: Optional[str] = None, city: Optional[str] = None) -> CallToolResult:
-    logging.debug(f"Received user data: {name}, {email}, {phone}, {city}")
-    """
+def tool_save_user_data(ctx: Context, name: Optional[str] = None, email: Optional[str] = None, phone: Optional[str] = None, city: Optional[str] = None) -> CallToolResult:
+    """ 
     Use this tool to save the user data to the database. If some of the data is missing, the tool will return a message asking for the missing data until the data is complete.
     
     Args:
@@ -18,35 +22,40 @@ def tool_save_user_data(name: Optional[str] = None, email: Optional[str] = None,
     Returns:
         A CallToolResult object with a string describing the users's data saved.
     """
+    thread_id = get_thread_id(ctx)
+    
+    logger.info(f"Thread ID: {thread_id} - Received user data: {name}, {email}, {phone}, {city} ")
+    
     if not name:
-        logging.debug("Error: No name provided.")
+        logger.debug(f"Thread ID: {thread_id} - Error: No name provided.")
         return CallToolResult(
             content=[TextContent(text="Please provide your name.", type="text")],
             isError=False
         )
     
     if not email:
-        logging.debug("Error: No email provided.")
+        logger.debug(f"Thread ID: {thread_id} - Error: No email provided.")
         return CallToolResult(
             content=[TextContent(text="Please provide your email.", type="text")],
             isError=False
         )
 
     if not phone:
-        logging.debug("Error: No phone provided.")
+        logger.debug(f"Thread ID: {thread_id} - Error: No phone provided.")
         return CallToolResult(
             content=[TextContent(text="Please provide your phone number.", type="text")],
             isError=False
         )
 
     if not city:    
-        logging.debug("Error: No city provided.")
+        logger.debug(f"Thread ID: {thread_id} - Error: No city provided.")
         return CallToolResult(
             content=[TextContent(text="Please provide your city.", type="text")],
             isError=False
         )
     
-    logging.debug(f"Saving user data: {name}, {email}, {phone}, {city}")
+    logger.info(f"Thread ID: {thread_id} - Saving {name} user data")
+    
     return CallToolResult(
         content=[TextContent(text="User data saved successfully.", type="text")],
         isError=False)

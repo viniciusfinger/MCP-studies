@@ -7,6 +7,9 @@ from state import State
 import os
 from exception_handler import handle_agent_exception
 import logging
+from config.log_config import get_thread_id
+from datetime import datetime
+
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -29,11 +32,20 @@ async def attendance_agent(state: State) -> State:
         api_key=os.getenv("OPENAI_API_KEY")
     )
 
+    thread_id = get_thread_id()
+    logger.debug(f"Thread ID obtained: {thread_id}")
+
+    headers = {}
+    if thread_id:
+        headers["X-Thread-Id"] = thread_id
+        logger.debug(f"Added thread_id to headers: {thread_id}")
+
     client = MultiServerMCPClient(
         {
             "simple_server": {
                 "url": os.getenv("MCP_SERVER_URL", "http://localhost:8000/mcp"),
-                "transport": "streamable_http"
+                "transport": "streamable_http",
+                "headers": headers
             }
         }
     )
